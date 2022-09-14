@@ -6,4 +6,9 @@ const cadastroSchema = joi.object({
     senha: joi.string().min(1).required()
 })
 
-export { cadastroSchema };
+const loginSchema = joi.object({
+    email: joi.string().min(1).email().required(),
+    senha: joi.string().min(1).required()
+})
+
+export { cadastroSchema, loginSchema };
