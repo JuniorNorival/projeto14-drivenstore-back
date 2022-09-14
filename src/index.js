@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import chalk from 'chalk';
 
+import authRouter from "./routers/authRouter.js";
+
 dotenv.config()
 
 const app = express();
@@ -13,6 +15,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Tudo certo")
 })
+
+//Rota de Auth
+app.use(authRouter);
 
 app.listen(5000, () => {
     console.log("=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.");
