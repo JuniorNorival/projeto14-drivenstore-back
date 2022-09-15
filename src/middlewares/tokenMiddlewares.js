@@ -9,3 +9,5 @@ async function tokenValidation(req, res, next) {
 
   next();
 }
+
+export { tokenValidation };
