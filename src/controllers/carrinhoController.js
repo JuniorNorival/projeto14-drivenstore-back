@@ -45,7 +45,7 @@ const deletarProduto = async (req, res) => {
             return res.status(400).send("Produto não está no carrinho!");
         }
 
-        if (produto.quantidade > 0) {
+        if (produto.quantidade > 1) {
             await db.colletion("carrinho").updateOne({_id: produto._id}, {$set: {
                 ...produto,
                 quantidade: (produto.quantidade - 1)
@@ -64,4 +64,26 @@ const deletarProduto = async (req, res) => {
     res.sendStatus(201);
 }
 
-export { carregarCarrinho, finalizarCarrinho, deletarProduto }
+const editarProduto = async (req, res) => {
+    const idProduto = req.params;
+
+    try {
+        const produto = await db.collection("carrinho").findOne({ id: idProduto });
+        if (!produto) {
+            return res.status(400).send("Produto não conta no carrinho");
+        }
+
+        await db.collection("carrinho").updateOne({_id: produto._id}, {$set: {
+            ...produto,
+            quantidade: produto.quantidade + 1
+        }});
+
+        res.status(201).send("Mais um produto incluso")
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Erro ao editar o Carrinho")
+    }
+
+};
+
+export { carregarCarrinho, finalizarCarrinho, deletarProduto, editarProduto }
