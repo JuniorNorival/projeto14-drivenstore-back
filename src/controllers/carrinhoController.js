@@ -36,15 +36,8 @@ const finalizarCarrinho = async (req, res) => {
 }
 
 const deletarProduto = async (req, res) => {
-    const idProduto = req.params.id;
-
+    const produto = res.locals.produto;
     try {
-        const produto = await db.collection("carrinho").findOne({id: idProduto});
-
-        if (!produto) {
-            return res.status(400).send("Produto não está no carrinho!");
-        }
-
         if (produto.quantidade > 1) {
             await db.colletion("carrinho").updateOne({_id: produto._id}, {$set: {
                 ...produto,
@@ -65,14 +58,8 @@ const deletarProduto = async (req, res) => {
 }
 
 const editarProduto = async (req, res) => {
-    const idProduto = req.params;
-
+    const produto = res.locals.produto;
     try {
-        const produto = await db.collection("carrinho").findOne({ id: idProduto });
-        if (!produto) {
-            return res.status(400).send("Produto não conta no carrinho");
-        }
-
         await db.collection("carrinho").updateOne({_id: produto._id}, {$set: {
             ...produto,
             quantidade: produto.quantidade + 1
