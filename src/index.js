@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import chalk from 'chalk';
 
 import authRouter from "./routers/authRouter.js";
+import carrinhoRouter from "./routers/carrinhoRouter.js";
 
 dotenv.config()
 
@@ -18,6 +19,9 @@ app.get("/", (req, res) => {
 
 //Rota de Auth
 app.use(authRouter);
+
+//Rota de Carrinho
+app.use(carrinhoRouter);
 
 app.listen(5000, () => {
     console.log("=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.=.");
