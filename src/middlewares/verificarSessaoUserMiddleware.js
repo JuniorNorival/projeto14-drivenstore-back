@@ -16,8 +16,9 @@ async function verificarSessaoDoUsuario(req, res, next) {
         if (!user) {
             return res.sendStatus(401);
         }
-
+        delete user.senha
         res.locals.user = user;
+        res.locals.session = session;
         next();
     } catch (error) {
         console.error(error.message);

@@ -14,4 +14,10 @@ const carregarCarrinho = async (req, res) => {
     }
 };
 
-export { carregarCarrinho }
+const finalizarCarrinho = async (req, res) => {
+    const session = res.locals.session;
+
+    res.sendStatus(200);
+}
+
+export { carregarCarrinho, finalizarCarrinho }
