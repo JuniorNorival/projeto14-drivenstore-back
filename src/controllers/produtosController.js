@@ -3,9 +3,18 @@ import { mongo } from "../database/db.js";
 
 let db = await mongo();
 async function listarProdutos(req, res) {
+  const categoria = req.query.categoria;
+  console.log(categoria);
   try {
     const response = await db.collection("produtos").find().toArray();
-    res.send(response).status(200);
+    if (categoria === "todos" || !categoria) {
+      res.send(response).status(200);
+      return;
+    } else {
+      const produtos = response.filter((res) => res.category === categoria);
+      res.send(produtos).status(200);
+      return;
+    }
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -14,13 +23,14 @@ async function listarProdutos(req, res) {
 
 async function exibirProduto(req, res) {
   const { id } = req.params;
-  console.log(id);
+  const token = res.locals;
   try {
-    const response = await db
+    const produto = await db
       .collection("produtos")
       .findOne({ _id: ObjectId(id) });
-    console.log(response);
-    res.send(response).status(200);
+
+    console.log(produto);
+    res.send(produto).status(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -29,11 +39,12 @@ async function exibirProduto(req, res) {
 
 async function adcionarProduto(req, res) {
   const { id, titulo, imagem, preco } = req.headers;
-
+  const user = res.locals;
+  console.log(user);
   try {
     await db
       .collection("carrinho")
-      .insertOne({ id, titulo, imagem, preco, userId });
+      .insertOne({ id, titulo, imagem, preco, userId: user._id });
 
     res.sendStatus(201);
   } catch (error) {
