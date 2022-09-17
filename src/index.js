@@ -10,7 +10,6 @@ import produtosRouter from "./routers/produtosRouter.js";
 
 import carrinhoRouter from "./routers/carrinhoRouter.js";
 
-
 dotenv.config();
 
 const app = express();
