@@ -13,7 +13,6 @@ import produtosRouter from "./routers/produtosRouter.js";
 import carrinhoRouter from "./routers/carrinhoRouter.js";
 
 import pedidoRouter from "./routers/checkoutRouter.js";
-import { Db } from "mongodb";
 
 dotenv.config();
 
