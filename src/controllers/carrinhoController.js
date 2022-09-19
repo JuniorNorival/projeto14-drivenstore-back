@@ -8,6 +8,7 @@ async function adcionarNoCarrinho(req, res) {
   const { titulo, imagem, preco, quantidade } = req.body;
   const { id } = req.params;
   const { user } = res.locals;
+  console.log({ titulo, imagem, preco, quantidade })
 
   try {
     await db.collection("carrinho").insertOne({
@@ -50,10 +51,18 @@ const finalizarCarrinho = async (req, res) => {
       .find({ userId: user._id })
       .toArray();
 
+    let soma = 0;
+    listaCarrinho.map( (value)=> {
+      if (typeof value.preco === "number") {
+        soma += value.preco;
+      }
+    })
+
     await db.collection("pedidos").insertOne({
       pedidos: listaCarrinho,
       userId: user._id,
       user: user.nome,
+      total: soma,
       registro: dayjs().format("DD/MM"),
     });
     res.sendStatus(201);
@@ -110,10 +119,24 @@ const editarProduto = async (req, res) => {
   }
 };
 
+const limparCarrinho = async (req, res) => {
+  const user = res.locals.user;
+
+  try {
+    await db.collection("carrinho").delete({userId: user._id });
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Erro ao limpar o carrinho");
+  }
+}
+
 export {
   adcionarNoCarrinho,
   carregarCarrinho,
   finalizarCarrinho,
   deletarProduto,
   editarProduto,
+  limparCarrinho,
 };

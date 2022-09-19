@@ -6,6 +6,7 @@ import {
   deletarProduto,
   editarProduto,
   adcionarNoCarrinho,
+  limparCarrinho,
 } from "../controllers/carrinhoController.js";
 import { validarTokenExistente } from "../middlewares/validarTokenMiddleware.js";
 import { verificarSessaoDoUsuario } from "../middlewares/verificarSessaoUserMiddleware.js";
@@ -39,6 +40,11 @@ router.put(
   verificarSessaoDoUsuario,
   verificarSeProdutoEstaNoCarrinho,
   editarProduto
+);
+router.delete("/carrinho", 
+  validarTokenExistente,
+  verificarSessaoDoUsuario,
+  limparCarrinho
 );
 //Finalizar Carrinho
 router.post(
