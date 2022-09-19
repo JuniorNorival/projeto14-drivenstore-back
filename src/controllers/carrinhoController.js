@@ -9,6 +9,7 @@ async function adcionarNoCarrinho(req, res) {
   const { titulo, imagem, preco, quantidade } = req.body;
   const { id } = req.params;
   const { user } = res.locals;
+
   console.log(req.body);
   try {
     await db.collection("carrinho").insertOne({
@@ -52,11 +53,18 @@ const finalizarCarrinho = async (req, res) => {
       .find({ userId: user._id })
       .toArray();
 
-    console.log(listaCarrinho);
+    let soma = 0;
+    listaCarrinho.map( (value)=> {
+      if (typeof value.preco === "number") {
+        soma += value.preco;
+      }
+    })
+
     await db.collection("pedidos").insertOne({
       produtos: listaCarrinho,
       userId: user._id,
       user: user.nome,
+      total: soma,
       registro: dayjs().format("DD/MM"),
       sessaoId: sessao._id,
     });
@@ -70,28 +78,34 @@ const finalizarCarrinho = async (req, res) => {
 const deletarProduto = async (req, res) => {
   const produto = res.locals.produto;
   try {
-    if (produto.quantidade > 1) {
+
+    if (produto.quantidade <= 1) {
+      await db.collection("carrinho").deleteOne({ _id: ObjectId(produto._id) });
+
+      res.status(201).send("Produto removido");
+    }
+    
+    console.log("Qtd: " + produto.quantidade + " Tipo: " + typeof produto.quantidade);
+    if (produto.quantidade !== "1" || produto.quantidade > 1) {
+
       await db.collection("carrinho").updateOne(
         { _id: produto._id },
         {
           $set: {
-            ...produto,
-            quantidade: produto.quantidade - 1,
+            quantidade: Number(produto.quantidade) - 1,
           },
         }
       );
 
       return res.status(201).send("Quantidade do produto reduzida");
-    }
-
-    await db.collection("carrinho").deleteOne({ _id: ObjectId(produto._id) });
-
-    res.status(201).send("Produto removido");
+    } 
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Erro ao deletar o produto");
   }
-};
+
+
+}
 
 const editarProduto = async (req, res) => {
   const produto = res.locals.produto;
@@ -101,7 +115,7 @@ const editarProduto = async (req, res) => {
       {
         $set: {
           ...produto,
-          quantidade: produto.quantidade + 1,
+          quantidade: Number(produto.quantidade) + 1,
         },
       }
     );
@@ -113,10 +127,24 @@ const editarProduto = async (req, res) => {
   }
 };
 
+const limparCarrinho = async (req, res) => {
+  const user = res.locals.user;
+
+  try {
+    await db.collection("carrinho").deleteMany({userId: user._id });
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Erro ao limpar o carrinho");
+  }
+}
+
 export {
   adcionarNoCarrinho,
   carregarCarrinho,
   finalizarCarrinho,
   deletarProduto,
   editarProduto,
+  limparCarrinho,
 };

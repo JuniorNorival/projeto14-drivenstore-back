@@ -11,6 +11,8 @@ async function verificarSeProdutoEstaNoCarrinho(req, res, next) {
       .collection("carrinho")
       .findOne({ _id: ObjectId(idProduto) });
 
+    console.log(produto)
+
     if (!produto) {
       return res.status(400).send("Produto não está no carrinho!");
     }
