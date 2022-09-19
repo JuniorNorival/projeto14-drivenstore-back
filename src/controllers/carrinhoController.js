@@ -35,6 +35,7 @@ const carregarCarrinho = async (req, res) => {
       .collection("carrinho")
       .find({ userId: user._id })
       .toArray();
+
     res.status(200).send(listaCarrinho);
   } catch (error) {
     console.error(error.message);
@@ -43,19 +44,21 @@ const carregarCarrinho = async (req, res) => {
 };
 
 const finalizarCarrinho = async (req, res) => {
-  const user = res.locals.user;
-
+  const { user, token } = res.locals;
+  const sessao = await db.collection("sessoes").findOne({ token });
   try {
     const listaCarrinho = await db
       .collection("carrinho")
       .find({ userId: user._id })
       .toArray();
 
+    console.log(listaCarrinho);
     await db.collection("pedidos").insertOne({
-      pedidos: listaCarrinho,
+      produtos: listaCarrinho,
       userId: user._id,
       user: user.nome,
       registro: dayjs().format("DD/MM"),
+      sessaoId: sessao._id,
     });
     res.sendStatus(201);
   } catch (error) {
@@ -68,7 +71,7 @@ const deletarProduto = async (req, res) => {
   const produto = res.locals.produto;
   try {
     if (produto.quantidade > 1) {
-      await db.colletion("carrinho").updateOne(
+      await db.collection("carrinho").updateOne(
         { _id: produto._id },
         {
           $set: {
