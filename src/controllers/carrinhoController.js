@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ObjectId } from "mongodb";
 
 import { mongo } from "../database/db.js";
 
@@ -8,7 +9,7 @@ async function adcionarNoCarrinho(req, res) {
   const { titulo, imagem, preco, quantidade } = req.body;
   const { id } = req.params;
   const { user } = res.locals;
-
+  console.log(req.body);
   try {
     await db.collection("carrinho").insertOne({
       idProduto: id,
@@ -80,21 +81,20 @@ const deletarProduto = async (req, res) => {
       return res.status(201).send("Quantidade do produto reduzida");
     }
 
-    await db.collection("carrinho").deleteOne({ _id: produto._id });
+    await db.collection("carrinho").deleteOne({ _id: ObjectId(produto._id) });
 
     res.status(201).send("Produto removido");
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Erro ao deletar o produto");
   }
-  res.sendStatus(201);
 };
 
 const editarProduto = async (req, res) => {
   const produto = res.locals.produto;
   try {
     await db.collection("carrinho").updateOne(
-      { _id: produto._id },
+      { _id: ObjectId(produto._id) },
       {
         $set: {
           ...produto,
