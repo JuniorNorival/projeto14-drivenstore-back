@@ -75,23 +75,24 @@ const finalizarCarrinho = async (req, res) => {
 const deletarProduto = async (req, res) => {
   const produto = res.locals.produto;
   try {
-    if (produto.quantidade > 1) {
-      await db.colletion("carrinho").updateOne(
+    if (produto.quantidade <= 1) {
+      await db.collection("carrinho").deleteOne({ _id: produto._id });
+      return res.status(201).send("Produto removido");
+    }
+    
+    console.log("Qtd: " + produto.quantidade + " Tipo: " + typeof produto.quantidade);
+    if (produto.quantidade !== "1" || produto.quantidade > 1) {
+      await db.collection("carrinho").updateOne(
         { _id: produto._id },
         {
           $set: {
-            ...produto,
-            quantidade: produto.quantidade - 1,
+            quantidade: Number(produto.quantidade) - 1,
           },
         }
       );
 
       return res.status(201).send("Quantidade do produto reduzida");
     }
-
-    await db.collection("carrinho").deleteOne({ _id: produto._id });
-
-    res.status(201).send("Produto removido");
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Erro ao deletar o produto");
@@ -107,7 +108,7 @@ const editarProduto = async (req, res) => {
       {
         $set: {
           ...produto,
-          quantidade: produto.quantidade + 1,
+          quantidade: Number(produto.quantidade) + 1,
         },
       }
     );
