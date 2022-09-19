@@ -5,7 +5,7 @@ function validarTokenExistente(req, res, next) {
     res.locals.token = token;
     next();
   } else {
-    return res.sendStatus(401);
+    return res.status(401).send("Token Invalido");
   }
 }
 
