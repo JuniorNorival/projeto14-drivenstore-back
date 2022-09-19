@@ -123,7 +123,7 @@ const limparCarrinho = async (req, res) => {
   const user = res.locals.user;
 
   try {
-    await db.collection("carrinho").delete({userId: user._id });
+    await db.collection("carrinho").deleteMany({userId: user._id });
 
     res.sendStatus(200);
   } catch (error) {
